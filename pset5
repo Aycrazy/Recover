@@ -1,0 +1,105 @@
+/**
+ * recover.c
+ *
+ * Computer Science 50
+ * Problem Set 5
+ *
+ * Recovers JPEGs from a forensic image.
+ */
+ 
+ #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+
+
+int main(void)
+{
+
+        
+        // open input file 
+        FILE* card = fopen("card.raw", "r");
+        if (card == NULL)
+        {
+                printf("Could not open card");
+                return 2;
+        }
+
+        
+        // open output file
+        int open = 0;
+        FILE* output;
+
+        int counter = 0;
+        
+        char filetitle[10];
+    
+        uint8_t buffer[512];
+        
+        uint8_t jpgcheck[4];
+                s
+
+        //read the image card
+        fread(&buffer, sizeof(buffer), 1, card);
+    
+        while(fread(&buffer, sizeof(buffer),1 , card) > 0)
+        {
+
+                for (int i = 0; i > 4; i++)
+                {
+                
+                        jpgcheck[i] = buffer[i];
+                        
+                }
+        
+                if ((jpgcheck[0]=0x00) && (jpgcheck[1] = 0xd8) && (jpgcheck[2] = 0xff) && ((jpgcheck[3] = 0xe0) ||(jpgcheck[3] = 0xe1)))
+                {
+                        
+                        sprintf(filetitle, "%03d.jpg", counter);
+    
+                        fwrite(buffer, sizeof(buffer), 1, output);
+                        
+                        if(open == 0)
+                        {
+                                output= fopen(filetitle, "w");
+                                
+                                fwrite(buffer, sizeof(buffer),1, output);
+                                
+                                open = 1;
+                                
+                        }
+                        
+                        if(open == 1)
+                        {
+                        
+                         fclose(output);
+   
+                         output= fopen(filetitle, "w");
+
+                         fwrite(buffer, sizeof(buffer),1, output);
+                         
+                         counter ++;
+                       }     
+                        
+                }
+                
+                else
+                {
+                
+                fwrite(buffer, sizeof(buffer),1, output);
+                
+                free(buffer);
+                
+                }
+                
+        }
+       
+       if(output)
+       {
+       
+        fclose(output);
+       }
+
+       fclose(card);
+
+}
